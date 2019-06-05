@@ -6,13 +6,17 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 class PaperclipManager(view: View) {
-    private var seconds = 0
     var count = 0
-    private var unsoldCount = 0
+        private set
     var funds = 0.0
+        private set
+
+    private var seconds = 0
+    private var unsoldCount = 0
     private var ppc = 0.15              /* price per clip */
     private var pd = 0.0                /* public demand */
     private var marketingLevel = 1.0
+
     private val countText = view.findViewById<TextView>(R.id.paperclipCountText)
     private val unsoldText = view.findViewById<TextView>(R.id.unsoldInventoryText)
     private val ppcText = view.findViewById<TextView>(R.id.ppcText)

@@ -5,31 +5,36 @@ import android.widget.TextView
 import com.sagex.paperclips.PaperclipManager
 import com.sagex.paperclips.R
 
-data class AIEvent(val c: () -> Boolean, val m: String, val action: () -> Unit = {})
+data class AIEvent(val condition: () -> Boolean, val message: String, val action: () -> Unit = {})
 
-class AIMessenger(val paperclipManager: PaperclipManager, private val view: View) {
+class AIMessenger(private val paperclipManager: PaperclipManager, private val view: View) {
     val board = view.findViewById<TextView>(R.id.aiText)
-    var messages = mutableListOf(".", ".", ".", ">  Welcome to Universal Paperclips!")
-    var events = mutableListOf<AIEvent>(
-        AIEvent({ paperclipManager.funds > 5.0 }, "AutoClippers available for purchase")
+    var messages = mutableListOf(".", ".", ".", ".")
+    var events = mutableListOf(
+        AIEvent({ true }, "Welcome to Universal Paperclips!"),
+        AIEvent({ paperclipManager.funds >= 5.0 }, "AutoClippers available for purchase")
     )
 
-    init {
-        display()
-    }
+    init { checkState() }
 
     fun checkState() {
-        events.forEach { if (it.c.invoke()) {
-            newMessage(it.m)
+        val completed = mutableListOf<AIEvent>()
 
-        } }
+        events.forEach { e ->
+            if (e.condition.invoke()) {
+                newMessage(e.message)
+                e.action.invoke()
+                completed.add(e)
+            } }
+
+        completed.forEach { events.remove(it) }
     }
 
-    fun display() {
+    private fun display() {
         board.text = messages.joinToString("\n")
     }
 
-    fun newMessage(message: String) {
+    private fun newMessage(message: String) {
         messages.removeAt(0)
         messages.add(">  $message")
         display()
